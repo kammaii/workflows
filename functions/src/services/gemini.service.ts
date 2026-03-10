@@ -10,7 +10,7 @@ export class GeminiService {
 
     async generateKoreanDraft(title: string, body: string): Promise<{ title: string; content: string }> {
         const model = this.ai.getGenerativeModel({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-3.1-flash-lite-preview',
             generationConfig: {
                 responseMimeType: 'application/json',
             }
@@ -47,13 +47,22 @@ export class GeminiService {
 }
 `;
         const response = await model.generateContent(prompt);
-        const text = response.response.text();
-        return JSON.parse(text);
+        let text = response.response.text();
+
+        // Clean markdown backticks if present
+        text = text.replace(/^```(json)?/m, '').replace(/```$/m, '').trim();
+
+        try {
+            return JSON.parse(text);
+        } catch (error) {
+            console.error('JSON parsing failed. Raw response:', text);
+            throw error;
+        }
     }
 
     async generateEnglishFinal(title: string, content: string): Promise<any> {
         const model = this.ai.getGenerativeModel({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-3.1-flash-lite-preview',
             generationConfig: {
                 responseMimeType: 'application/json',
             }
@@ -88,13 +97,21 @@ Generate exactly 5 Rank Math SEO keywords (1 Main, 4 Secondary).
 }`;
 
         const response = await model.generateContent(prompt);
-        const text = response.response.text();
-        return JSON.parse(text);
+        let text = response.response.text();
+
+        text = text.replace(/^```(json)?/m, '').replace(/```$/m, '').trim();
+
+        try {
+            return JSON.parse(text);
+        } catch (error) {
+            console.error('JSON parsing failed. Raw response:', text);
+            throw error;
+        }
     }
 
     async generateThreads(title: string, content: string, link: string): Promise<{ threads: Array<{ english: string; korean: string }> }> {
         const model = this.ai.getGenerativeModel({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-3.1-flash-lite-preview',
             generationConfig: {
                 responseMimeType: 'application/json',
             }
@@ -119,7 +136,15 @@ Write 3-5 thread posts based on the blog.
 }
 `;
         const response = await model.generateContent(prompt);
-        const text = response.response.text();
-        return JSON.parse(text);
+        let text = response.response.text();
+
+        text = text.replace(/^```(json)?/m, '').replace(/```$/m, '').trim();
+
+        try {
+            return JSON.parse(text);
+        } catch (error) {
+            console.error('JSON parsing failed. Raw response:', text);
+            throw error;
+        }
     }
 }
